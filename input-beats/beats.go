@@ -2,7 +2,9 @@ package beatsinput
 
 import (
 	"crypto/tls"
+	"crypto/x509"
 	"fmt"
+	"io/ioutil"
 	"net"
 	"sync"
 	"time"
@@ -11,22 +13,9 @@ import (
 )
 
 func (p *processor) serve() error {
-	var ln net.Listener
-
-	lnUnsecure, err := net.Listen("tcp", fmt.Sprintf("%s:%d", p.opt.Host, p.opt.Port))
+	ln, err := net.Listen("tcp", fmt.Sprintf("%s:%d", p.opt.Host, p.opt.Port))
 	if err != nil {
 		return fmt.Errorf("Listener failed: %v", err)
-	}
-
-	if p.opt.SSLCrt != "" {
-		cert, err := tls.LoadX509KeyPair(p.opt.SSLCrt, p.opt.SSLKey)
-		if err != nil {
-			return fmt.Errorf("Error loading keys: %v", err)
-		}
-		config := tls.Config{Certificates: []tls.Certificate{cert}}
-		ln = tls.NewListener(lnUnsecure, &config)
-	} else {
-		ln = lnUnsecure
 	}
 
 	clientTerm := make(chan bool)
@@ -54,6 +43,41 @@ func (p *processor) serve() error {
 			// log.Printf("Error accepting connection: %v", err)
 			continue
 		}
+
+		if p.opt.Ssl == true {
+			config := tls.Config{}
+
+			// Server Certificates
+			cert, err := tls.LoadX509KeyPair(p.opt.Ssl_certificate, p.opt.Ssl_key)
+
+			if err != nil {
+				return fmt.Errorf("Error loading keys: %v", err)
+			}
+			config.Certificates = []tls.Certificate{cert}
+
+			// Certificate authority
+			if len(p.opt.Ssl_certificate_authorities) > 0 {
+				config.RootCAs = x509.NewCertPool()
+				for _, pemCertPath := range p.opt.Ssl_certificate_authorities {
+					pemCert, err := ioutil.ReadFile(pemCertPath)
+					if err != nil {
+						return fmt.Errorf("Error loading certificate authorities: %v", err)
+					}
+					config.RootCAs.AppendCertsFromPEM(pemCert)
+				}
+			}
+
+			// SSL Verification mode
+			if p.opt.Ssl_verify_mode == "peer" {
+				config.ClientAuth = tls.VerifyClientCertIfGiven
+			}
+			if p.opt.Ssl_verify_mode == "force_peer" {
+				config.ClientAuth = tls.RequireAndVerifyClientCert
+			}
+
+			conn = tls.Server(conn, &config)
+		}
+
 		wg.Add(1)
 		go p.clientServe(conn, &wg, clientTerm)
 	}
@@ -78,7 +102,11 @@ func (p *processor) clientServe(c net.Conn, wg *sync.WaitGroup, clientTerm chan 
 				// log.Printf("[%s] closing lumberjack connection", c.RemoteAddr().String())
 				return
 			}
-			e := p.NewPacket("", fields)
+			msg := ""
+			if txt, ok := fields["message"]; ok {
+				msg = txt.(string)
+			}
+			e := p.NewPacket(msg, fields)
 			field.ProcessCommonFields(e.Fields(), p.opt.Add_field, p.opt.Tags, p.opt.Type)
 			p.Send(e)
 		case <-clientTerm:

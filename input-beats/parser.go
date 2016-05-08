@@ -174,6 +174,7 @@ func (p *Parser) Parse() {
 
 Read:
 	for {
+		//TODO : handle congestion_threshold (readtimeout)
 		n, err := p.Conn.Read(b)
 
 		if err != nil || n == 0 {
