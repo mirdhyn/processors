@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/veino/veino/testutils"
+	"github.com/veino/runtime/testutils"
 )
 
 func TestNew(t *testing.T) {
