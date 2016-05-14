@@ -3,12 +3,13 @@ package when
 import (
 	"testing"
 
-	"github.com/clbanning/mxj"
 	"github.com/stretchr/testify/assert"
+	"github.com/veino/runtime/testutils"
+	"github.com/veino/veino"
 	"github.com/vjeantet/govaluate"
 )
 
-func getTestFields() mxj.Map {
+func getTestEvent() veino.IPacket {
 	m := map[string]interface{}{
 		"testString":  "true",
 		"testYes":     "yes",
@@ -34,108 +35,110 @@ func getTestFields() mxj.Map {
 			"country": "France",
 		},
 	}
-	return mxj.Map(m)
+
+	return testutils.NewTestEvent("test", "test", m)
+
 }
 
 func TestBasicLogicalStringEreg(t *testing.T) {
-	fields := getTestFields()
+	event := getTestEvent()
 	expression := "[way] =~ /(RECEIVE|SEND)/"
 	p := &processor{compiledExpressions: map[int]*govaluate.EvaluableExpression{}}
-	result, err := p.assertExpressionWithFields(0, expression, &fields)
+	result, err := p.assertExpressionWithFields(0, expression, event)
 	assert.Nil(t, err, "err is not nil")
 	assert.True(t, result)
 }
 
 func TestBasicLogicalINStringSlice(t *testing.T) {
-	fields := getTestFields()
+	event := getTestEvent()
 	expression := `"_grokparsefailure" in [tags]`
 	p := &processor{compiledExpressions: map[int]*govaluate.EvaluableExpression{}}
-	result, err := p.assertExpressionWithFields(0, expression, &fields)
+	result, err := p.assertExpressionWithFields(0, expression, event)
 	assert.Nil(t, err, "err is not nil")
 	assert.True(t, result)
 
 	expression = `"grokparsefailure" in [tags]`
-	result, err = p.assertExpressionWithFields(1, expression, &fields)
+	result, err = p.assertExpressionWithFields(1, expression, event)
 	assert.Nil(t, err, "err is not nil")
 	assert.False(t, result)
 }
 
 func TestBasicLogicalStringNOTINSliceNotPresent(t *testing.T) {
-	fields := getTestFields()
+	event := getTestEvent()
 	expression := `"_mumu" not in [tags]`
 	p := &processor{compiledExpressions: map[int]*govaluate.EvaluableExpression{}}
-	result, err := p.assertExpressionWithFields(0, expression, &fields)
+	result, err := p.assertExpressionWithFields(0, expression, event)
 	assert.Nil(t, err, "err is not nil")
 	assert.True(t, result)
 
 	expression = `"_grokparsefailure" not in [tags]`
-	result, err = p.assertExpressionWithFields(1, expression, &fields)
+	result, err = p.assertExpressionWithFields(1, expression, event)
 	assert.Nil(t, err, "err is not nil")
 	assert.False(t, result)
 }
 
 func TestBasicLogicalStringEquality(t *testing.T) {
-	fields := getTestFields()
+	event := getTestEvent()
 	expression := "[testString] == \"true\""
 
 	p := &processor{compiledExpressions: map[int]*govaluate.EvaluableExpression{}}
-	result, err := p.assertExpressionWithFields(0, expression, &fields)
+	result, err := p.assertExpressionWithFields(0, expression, event)
 	assert.Nil(t, err, "err is not nil")
 	assert.True(t, result)
 }
 
 func TestBasicLogicalStringEquality2(t *testing.T) {
-	fields := getTestFields()
+	event := getTestEvent()
 	expression := "[testString] == \"true\""
 
 	p := &processor{compiledExpressions: map[int]*govaluate.EvaluableExpression{}}
-	result, err := p.assertExpressionWithFields(0, expression, &fields)
+	result, err := p.assertExpressionWithFields(0, expression, event)
 	assert.Nil(t, err, "err is not nil")
 	assert.True(t, result)
 }
 
 func TestBasicLogicalBooleanEquality(t *testing.T) {
-	fields := getTestFields()
+	event := getTestEvent()
 	expression := `[location][city] == "Paris"`
 
 	p := &processor{compiledExpressions: map[int]*govaluate.EvaluableExpression{}}
-	result, err := p.assertExpressionWithFields(0, expression, &fields)
+	result, err := p.assertExpressionWithFields(0, expression, event)
 	assert.Nil(t, err, "err is not nil")
 	assert.True(t, result)
 }
 
 func TestBasicLogicalIntEquality(t *testing.T) {
-	fields := getTestFields()
+	event := getTestEvent()
 	expression := "[testInt] == 4"
 
 	p := &processor{compiledExpressions: map[int]*govaluate.EvaluableExpression{}}
-	result, err := p.assertExpressionWithFields(0, expression, &fields)
+	result, err := p.assertExpressionWithFields(0, expression, event)
 	assert.Nil(t, err, "err is not nil")
 	assert.True(t, result)
 }
 
 func TestBasicLogicalIntGTFields(t *testing.T) {
-	fields := getTestFields()
+	event := getTestEvent()
 	expression := "[testInt] > [testInt3]"
 
 	p := &processor{compiledExpressions: map[int]*govaluate.EvaluableExpression{}}
-	result, err := p.assertExpressionWithFields(0, expression, &fields)
+	result, err := p.assertExpressionWithFields(0, expression, event)
 	assert.Nil(t, err, "err is not nil")
 	assert.True(t, result)
 }
 
 func TestVariableNotSet(t *testing.T) {
-	fields := getTestFields()
+	event := getTestEvent()
 	expression := "[testUnk] > 3"
 	p := &processor{compiledExpressions: map[int]*govaluate.EvaluableExpression{}}
-	_, err := p.assertExpressionWithFields(0, expression, &fields)
+	_, err := p.assertExpressionWithFields(0, expression, event)
 	assert.NotNil(t, err, "err is not nil")
 }
 
 func TestExpressionBRoker(t *testing.T) {
-	fields := getTestFields()
+	event := getTestEvent()
 	expression := "[testUnk > 3"
 	p := &processor{compiledExpressions: map[int]*govaluate.EvaluableExpression{}}
-	_, err := p.assertExpressionWithFields(0, expression, &fields)
+	_, err := p.assertExpressionWithFields(0, expression, event)
 	assert.NotNil(t, err, "err is not nil")
 }

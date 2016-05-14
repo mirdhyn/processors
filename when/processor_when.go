@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/clbanning/mxj"
 	"github.com/mitchellh/mapstructure"
 	"github.com/veino/veino"
 	"github.com/vjeantet/govaluate"
@@ -59,7 +58,7 @@ func (p *processor) Receive(e veino.IPacket) error {
 	for order := 0; order < len(p.opt.Expressions); order++ {
 		expressionValue := p.opt.Expressions[order]
 
-		result, err := p.assertExpressionWithFields(order, expressionValue, e.Fields())
+		result, err := p.assertExpressionWithFields(order, expressionValue, e)
 		if err != nil {
 			p.logger.Printf("When processor evaluation error : %s\n", err.Error())
 			continue
@@ -81,7 +80,7 @@ func (p *processor) Stop(e veino.IPacket) error { return nil }
 
 // With Knetic/govaluate
 
-func (p *processor) assertExpressionWithFields(index int, expressionValue string, fields *mxj.Map) (bool, error) {
+func (p *processor) assertExpressionWithFields(index int, expressionValue string, e veino.IPacket) (bool, error) {
 	expression, err := p.cacheExpression(index, expressionValue)
 	if err != nil {
 		return false, fmt.Errorf("conditional expression error : %s", err.Error())
@@ -89,7 +88,7 @@ func (p *processor) assertExpressionWithFields(index int, expressionValue string
 	parameters := make(map[string]interface{})
 	for _, v := range expression.Tokens() {
 		if v.Kind == govaluate.VARIABLE {
-			paramValue, err := fields.ValueForPath(v.Value.(string))
+			paramValue, err := e.Fields().ValueForPath(v.Value.(string))
 			if err != nil {
 				return false, fmt.Errorf("conditional field not found : %s", err.Error())
 			}
