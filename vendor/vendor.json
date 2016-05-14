@@ -73,10 +73,6 @@
 			"revisionTime": "2016-04-12T13:37:56Z"
 		},
 		{
-			"path": "github.com/go-playground/validator",
-			"revision": ""
-		},
-		{
 			"checksumSHA1": "arojRtqOmOlvVF+Bo4mv05dF/wc=",
 			"path": "github.com/hpcloud/tail",
 			"revision": "a30252cb686a21eb2d0b98132633053ec2f7f1e5",
