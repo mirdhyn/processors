@@ -20,7 +20,7 @@ type processor struct {
 	Send      veino.PacketSender
 	NewPacket veino.PacketBuilder
 	opt       *options
-	stream    anaconda.Stream
+	stream    *anaconda.Stream
 }
 
 type options struct {
@@ -97,14 +97,13 @@ func (p *processor) Start(e veino.IPacket) error {
 
 	p.stream = api.PublicStreamFilter(v)
 
-	go p.doStream(&p.stream, e, p.opt)
+	go p.doStream(p.stream, e, p.opt)
 
 	return nil
 }
 
 func (p *processor) Stop(e veino.IPacket) error {
-	p.stream.Interrupt()
-	p.stream.End()
+	p.stream.Stop()
 	return nil
 }
 
