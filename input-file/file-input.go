@@ -4,10 +4,10 @@ import (
 	"os"
 	"time"
 
-	"github.com/go-playground/validator"
 	"github.com/mitchellh/mapstructure"
 	"github.com/veino/field"
 	"github.com/veino/veino"
+	"gopkg.in/go-playground/validator.v8"
 
 	"github.com/hpcloud/tail"
 	"github.com/hpcloud/tail/watch"

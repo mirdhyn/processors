@@ -67,6 +67,12 @@
 			"revisionTime": "2016-04-12T16:13:20Z"
 		},
 		{
+			"checksumSHA1": "uPFzTgMPe756EOzGSH9ATxjQfCw=",
+			"path": "github.com/go-fsnotify/fsnotify",
+			"revision": "30411dbcefb7a1da7e84f75530ad3abe4011b4f8",
+			"revisionTime": "2016-04-12T13:37:56Z"
+		},
+		{
 			"path": "github.com/go-playground/validator",
 			"revision": ""
 		},
@@ -137,10 +143,22 @@
 			"revisionTime": "2016-02-03T16:03:05Z"
 		},
 		{
+			"checksumSHA1": "xKKB3W0e3obKRwa4ZaR/JXIpZfo=",
+			"path": "github.com/tsaikd/KDGoLib/futil",
+			"revision": "b89d09672d2326fb2b355bb74099cfe7bec3b909",
+			"revisionTime": "2016-05-06T16:42:05Z"
+		},
+		{
 			"checksumSHA1": "pyPTcYVPD4vpi/EjKR2bWwedgto=",
 			"path": "github.com/vjeantet/go.enmime",
 			"revision": "cea4778fd1dc13bcd5e55b7d88e6bee026521ee1",
 			"revisionTime": "2015-04-16T19:38:58Z"
+		},
+		{
+			"checksumSHA1": "XCoy6RX9mkGWGl9803UQbtpwgvg=",
+			"path": "github.com/vjeantet/govaluate",
+			"revision": "a9eab0aaf8f2fc46409915a30ec3a8425b204b76",
+			"revisionTime": "2016-05-14T07:31:31Z"
 		},
 		{
 			"checksumSHA1": "yGLJPcNKlm3yPLp4d8x1E5iMiVI=",
@@ -159,6 +177,24 @@
 			"path": "golang.org/x/net/publicsuffix",
 			"revision": "30be488e9140ebb7fac3b2995ac5a4b4d5e715ed",
 			"revisionTime": "2016-04-23T13:36:41Z"
+		},
+		{
+			"checksumSHA1": "XzoC4wn163HkmuDwKbC8qHBWfpg=",
+			"path": "golang.org/x/sys/unix",
+			"revision": "33267e036fd93fcd26ea95b7bdaf2d8306cb743c",
+			"revisionTime": "2016-05-11T16:29:03Z"
+		},
+		{
+			"checksumSHA1": "JfVmsMwyeeepbdw4q4wpN07BuFg=",
+			"path": "gopkg.in/fsnotify.v1",
+			"revision": "30411dbcefb7a1da7e84f75530ad3abe4011b4f8",
+			"revisionTime": "2016-04-12T13:37:56Z"
+		},
+		{
+			"checksumSHA1": "9+TP2NPlTWXoRndq02uwZW26AqI=",
+			"path": "gopkg.in/go-playground/validator.v8",
+			"revision": "014792cf3e266caff1e916876be12282b33059e0",
+			"revisionTime": "2016-02-23T20:26:51Z"
 		},
 		{
 			"checksumSHA1": "bDSCvmvwCYcN5mPjePIzpPyqGYM=",
@@ -201,6 +237,12 @@
 			"path": "gopkg.in/olivere/elastic.v2/uritemplates",
 			"revision": "8e3e7f1607e680085749746e756383b848e1e42f",
 			"revisionTime": "2016-05-11T15:37:34Z"
+		},
+		{
+			"checksumSHA1": "TO8baX+t1Qs7EmOYth80MkbKzFo=",
+			"path": "gopkg.in/tomb.v1",
+			"revision": "dd632973f1e7218eb1089048e0798ec9ae7dceb8",
+			"revisionTime": "2014-10-24T13:56:13Z"
 		}
 	],
 	"rootPath": "github.com/veino/processors"

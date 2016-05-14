@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/go-playground/validator"
 	"github.com/k0kubun/pp"
 	"github.com/mitchellh/mapstructure"
 	"github.com/veino/runtime/memory"
 	"github.com/veino/veino"
+	"gopkg.in/go-playground/validator.v8"
 )
 
 const (
