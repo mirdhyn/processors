@@ -65,7 +65,7 @@ func (p *processor) Receive(e veino.IPacket) error {
 		p.logger.Printf("unknow codec %s", p.opt.Codec)
 	}
 
-	p.Memory.Set("", e.Fields().StringIndent(2))
+	p.Memory.Set("", e.Fields().StringIndentNoTypeInfo(2))
 	return nil
 }
 
