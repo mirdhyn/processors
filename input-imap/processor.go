@@ -1,10 +1,8 @@
 package imap_input
 
 import (
-	"time"
-
+	"github.com/etrepat/postman/watch"
 	"github.com/veino/veino"
-	"github.com/vjeantet/postman/watch"
 )
 
 func New(l veino.Logger) veino.Processor {
@@ -15,26 +13,25 @@ type processor struct {
 	NewPacket veino.PacketBuilder
 	Send      veino.PacketSender
 	logger    veino.Logger
-	config    *watch.Config
+	config    *watch.Flags
 	watcher   *watch.Watch
 }
 
 func (p *processor) Configure(conf map[string]interface{}) error {
-	p.config = watch.NewConfig()
+	p.config = watch.NewFlags()
 	p.config.Host = conf["host"].(string)
 	p.config.Port = uint(conf["port"].(float64))
 	p.config.Ssl = conf["ssl"].(bool)
 	p.config.Mailbox = conf["mailbox"].(string)
 	p.config.Password = conf["password"].(string)
 	p.config.Username = conf["username"].(string)
-	p.config.Idletimeout = time.Duration(int(conf["idletimeout"].(float64))) * time.Minute
 	return nil
 }
 
 func (p *processor) Receive(e veino.IPacket) error { return nil }
 
 func (p *processor) Stop(e veino.IPacket) error {
-	p.logger.Printf("imap input - closing connection... please wait (max %d minutes)", p.config.Idletimeout/time.Minute)
+	p.logger.Printf("imap input - closing connection...")
 	p.watcher.Stop()
 
 	return nil
