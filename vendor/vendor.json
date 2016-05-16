@@ -165,12 +165,6 @@
 			"revisionTime": "2016-04-27T19:49:21Z"
 		},
 		{
-			"checksumSHA1": "GIGmSrYACByf5JDIP9ByBZksY80=",
-			"path": "golang.org/x/net/idna",
-			"revision": "ef00b378c73f107bf44d5c9b69875255ce89b79a",
-			"revisionTime": "2016-05-15T03:16:23Z"
-		},
-		{
 			"checksumSHA1": "uR2JExVr6/6ZrBtvm7XguieokNI=",
 			"path": "golang.org/x/net/publicsuffix",
 			"revision": "ef00b378c73f107bf44d5c9b69875255ce89b79a",
