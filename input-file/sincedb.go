@@ -1,23 +1,28 @@
 package fileinput
 
+// Code source from github.com/tsaikd/gogstash
+// @see https://github.com/tsaikd/gogstash/tree/master/input/file
+
 import (
 	"bytes"
 	"encoding/json"
 	"io/ioutil"
 	"os"
+	"sync"
 	"time"
 )
 
-type SinceDBInfo struct {
+type sinceDBInfo struct {
 	Offset int64 `json:"offset,omitempty"`
 }
 
-func (p *processor) LoadSinceDBInfos() (err error) {
+func (p *processor) loadSinceDBInfos() (err error) {
 	var (
 		raw []byte
 	)
-	p.Logger.Println("LoadSinceDBInfos")
-	p.SinceDBInfos = map[string]*SinceDBInfo{}
+	p.sinceDBInfosMutex = &sync.Mutex{}
+
+	p.sinceDBInfos = map[string]*sinceDBInfo{}
 
 	if p.opt.Sincedb_path == "" || p.opt.Sincedb_path == "/dev/null" {
 		p.Logger.Println("No valid sincedb path")
@@ -34,7 +39,7 @@ func (p *processor) LoadSinceDBInfos() (err error) {
 		return
 	}
 
-	if err = json.Unmarshal(raw, &p.SinceDBInfos); err != nil {
+	if err = json.Unmarshal(raw, &p.sinceDBInfos); err != nil {
 		p.Logger.Printf("Unmarshal sincedb failed: %q\n%s", p.opt.Sincedb_path, err)
 		return
 	}
@@ -42,22 +47,26 @@ func (p *processor) LoadSinceDBInfos() (err error) {
 	return
 }
 
-func (p *processor) SaveSinceDBInfos() (err error) {
+func (p *processor) saveSinceDBInfos() (err error) {
 	var (
 		raw []byte
 	)
-	p.Logger.Println("SaveSinceDBInfos")
-	p.SinceDBLastSaveTime = time.Now()
+
+	p.sinceDBLastSaveTime = time.Now()
 
 	if p.opt.Sincedb_path == "" || p.opt.Sincedb_path == "/dev/null" {
 		p.Logger.Println("No valid sincedb path")
 		return
 	}
 
-	if raw, err = json.Marshal(p.SinceDBInfos); err != nil {
+	p.sinceDBInfosMutex.Lock()
+	if raw, err = json.Marshal(p.sinceDBInfos); err != nil {
+		p.sinceDBInfosMutex.Unlock()
 		p.Logger.Printf("Marshal sincedb failed: %s", err)
 		return
 	}
+	p.sinceDBInfosMutex.Unlock()
+
 	p.sinceDBLastInfosRaw = raw
 
 	if err = ioutil.WriteFile(p.opt.Sincedb_path, raw, 0664); err != nil {
@@ -68,26 +77,26 @@ func (p *processor) SaveSinceDBInfos() (err error) {
 	return
 }
 
-func (p *processor) CheckSaveSinceDBInfos() (err error) {
+func (p *processor) checkSaveSinceDBInfos() (err error) {
 	var (
 		raw []byte
 	)
-	if time.Since(p.SinceDBLastSaveTime) > time.Duration(p.opt.Sincedb_write_interval)*time.Second {
-		if raw, err = json.Marshal(p.SinceDBInfos); err != nil {
+	if time.Since(p.sinceDBLastSaveTime) > time.Duration(p.opt.Sincedb_write_interval)*time.Second {
+		if raw, err = json.Marshal(p.sinceDBInfos); err != nil {
 			p.Logger.Printf("Marshal sincedb failed: %s", err)
 			return
 		}
 		if bytes.Compare(raw, p.sinceDBLastInfosRaw) != 0 {
-			err = p.SaveSinceDBInfos()
+			err = p.saveSinceDBInfos()
 		}
 	}
 	return
 }
 
-func (p *processor) CheckSaveSinceDBInfosLoop() (err error) {
+func (p *processor) checkSaveSinceDBInfosLoop() (err error) {
 	for {
 		time.Sleep(time.Duration(p.opt.Sincedb_write_interval) * time.Second)
-		if err = p.CheckSaveSinceDBInfos(); err != nil {
+		if err = p.checkSaveSinceDBInfos(); err != nil {
 			return
 		}
 	}
