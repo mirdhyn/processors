@@ -3,10 +3,6 @@
 	"ignore": "test",
 	"package": [
 		{
-			"path": "code.google.com/p/mahonia",
-			"revision": ""
-		},
-		{
 			"checksumSHA1": "KnxORlhfLzZ4XMYBcmA26w9HDyE=",
 			"path": "github.com/ChimeraCoder/anaconda",
 			"revision": "91bfbf5de08def2e8b5480b52cae811d2bde3af9",
@@ -17,6 +13,12 @@
 			"path": "github.com/ChimeraCoder/tokenbucket",
 			"revision": "c5a927568de7aad8a58127d80bcd36ca4e71e454",
 			"revisionTime": "2013-12-01T22:36:12Z"
+		},
+		{
+			"checksumSHA1": "ucu0eJ90b2Jlj+KPt0YJzGfwm7s=",
+			"path": "github.com/axgle/mahonia",
+			"revision": "c528b747d92d41ca581a7acf3e604c396fc7c034",
+			"revisionTime": "2015-10-19T00:40:08Z"
 		},
 		{
 			"checksumSHA1": "3RgReu+42CU1EQ6afDsVSvBuPyk=",
@@ -145,10 +147,10 @@
 			"revisionTime": "2016-05-06T16:42:05Z"
 		},
 		{
-			"checksumSHA1": "pyPTcYVPD4vpi/EjKR2bWwedgto=",
+			"checksumSHA1": "yfYAIowXr2aRtR/LawlJiA/Ghtg=",
 			"path": "github.com/vjeantet/go.enmime",
-			"revision": "cea4778fd1dc13bcd5e55b7d88e6bee026521ee1",
-			"revisionTime": "2015-04-16T19:38:58Z"
+			"revision": "278de7067204c8910b01e8bce043ed8d530de0dd",
+			"revisionTime": "2016-05-16T09:47:39Z"
 		},
 		{
 			"checksumSHA1": "XCoy6RX9mkGWGl9803UQbtpwgvg=",

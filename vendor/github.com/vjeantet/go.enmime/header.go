@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"code.google.com/p/mahonia"
+	"github.com/axgle/mahonia"
 )
 
 func debug(format string, args ...interface{}) {
