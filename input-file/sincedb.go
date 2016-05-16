@@ -4,9 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"io/ioutil"
+	"os"
 	"time"
-
-	"github.com/tsaikd/KDGoLib/futil"
 )
 
 type SinceDBInfo struct {
@@ -25,9 +24,9 @@ func (p *processor) LoadSinceDBInfos() (err error) {
 		return
 	}
 
-	if !futil.IsExist(p.opt.Sincedb_path) {
+	if _, err := os.Stat(p.opt.Sincedb_path); os.IsNotExist(err) {
 		p.Logger.Printf("sincedb not found: %q", p.opt.Sincedb_path)
-		return
+		return err
 	}
 
 	if raw, err = ioutil.ReadFile(p.opt.Sincedb_path); err != nil {

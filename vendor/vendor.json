@@ -141,12 +141,6 @@
 			"revisionTime": "2016-02-03T16:03:05Z"
 		},
 		{
-			"checksumSHA1": "xKKB3W0e3obKRwa4ZaR/JXIpZfo=",
-			"path": "github.com/tsaikd/KDGoLib/futil",
-			"revision": "b89d09672d2326fb2b355bb74099cfe7bec3b909",
-			"revisionTime": "2016-05-06T16:42:05Z"
-		},
-		{
 			"checksumSHA1": "yfYAIowXr2aRtR/LawlJiA/Ghtg=",
 			"path": "github.com/vjeantet/go.enmime",
 			"revision": "278de7067204c8910b01e8bce043ed8d530de0dd",
@@ -163,12 +157,6 @@
 			"path": "github.com/vjeantet/grok",
 			"revision": "83bfdfdfd1a8146795b28e547a8e3c8b28a466c2",
 			"revisionTime": "2016-04-27T19:49:21Z"
-		},
-		{
-			"checksumSHA1": "GIGmSrYACByf5JDIP9ByBZksY80=",
-			"path": "golang.org/x/net/idna",
-			"revision": "30be488e9140ebb7fac3b2995ac5a4b4d5e715ed",
-			"revisionTime": "2016-04-23T13:36:41Z"
 		},
 		{
 			"checksumSHA1": "uR2JExVr6/6ZrBtvm7XguieokNI=",
