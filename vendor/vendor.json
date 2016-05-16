@@ -105,6 +105,12 @@
 			"revisionTime": "2016-04-28T00:30:50Z"
 		},
 		{
+			"checksumSHA1": "QVALLtQ7n6pt+YJiFrnng1O86PI=",
+			"path": "github.com/k0kubun/pp",
+			"revision": "36d5366f4ec038f9a76dd85c7b29074089bb9b9e",
+			"revisionTime": "2015-07-23T12:16:29Z"
+		},
+		{
 			"checksumSHA1": "KCJhN9Dx329wAN/SeL4CxeypPyk=",
 			"path": "github.com/mitchellh/mapstructure",
 			"revision": "d2dd0262208475919e1a362f675cfc0e7c10e905",
@@ -159,10 +165,16 @@
 			"revisionTime": "2016-04-27T19:49:21Z"
 		},
 		{
+			"checksumSHA1": "GIGmSrYACByf5JDIP9ByBZksY80=",
+			"path": "golang.org/x/net/idna",
+			"revision": "ef00b378c73f107bf44d5c9b69875255ce89b79a",
+			"revisionTime": "2016-05-15T03:16:23Z"
+		},
+		{
 			"checksumSHA1": "uR2JExVr6/6ZrBtvm7XguieokNI=",
 			"path": "golang.org/x/net/publicsuffix",
-			"revision": "30be488e9140ebb7fac3b2995ac5a4b4d5e715ed",
-			"revisionTime": "2016-04-23T13:36:41Z"
+			"revision": "ef00b378c73f107bf44d5c9b69875255ce89b79a",
+			"revisionTime": "2016-05-15T03:16:23Z"
 		},
 		{
 			"checksumSHA1": "XzoC4wn163HkmuDwKbC8qHBWfpg=",
