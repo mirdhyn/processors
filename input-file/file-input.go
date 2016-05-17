@@ -60,7 +60,7 @@ func (p *processor) Configure(ctx map[string]interface{}, conf map[string]interf
 		p.opt.Sincedb_path = usr.HomeDir + "/" + p.opt.Sincedb_path
 	}
 
-	return p.Base.ConfigureAndValidate(ctx, conf, p.opt)
+	return p.ConfigureAndValidate(ctx, conf, p.opt)
 }
 func (p *processor) Start(e veino.IPacket) error {
 	watch.POLL_DURATION = time.Second * time.Duration(p.opt.Stat_interval)

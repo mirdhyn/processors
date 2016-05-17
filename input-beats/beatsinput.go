@@ -78,7 +78,7 @@ func (p *processor) Configure(ctx map[string]interface{}, conf map[string]interf
 	p.opt.Ssl = false
 	p.opt.Ssl_verify_mode = "none"
 
-	return p.Base.ConfigureAndValidate(ctx, conf, p.opt)
+	return p.ConfigureAndValidate(ctx, conf, p.opt)
 }
 
 func (p *processor) Start(e veino.IPacket) error {

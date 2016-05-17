@@ -60,7 +60,7 @@ func (p *processor) Configure(ctx map[string]interface{}, conf map[string]interf
 	p.opt.Target = "@timestamp"
 	p.opt.Tag_on_failure = []string{"_dateparsefailure"}
 
-	if err := p.Base.ConfigureAndValidate(ctx, conf, p.opt); err != nil {
+	if err := p.ConfigureAndValidate(ctx, conf, p.opt); err != nil {
 		return err
 	}
 

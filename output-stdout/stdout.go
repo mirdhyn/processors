@@ -36,7 +36,7 @@ type processor struct {
 
 func (p *processor) Configure(ctx map[string]interface{}, conf map[string]interface{}) error {
 	p.opt.Codec = CODEC_LINE
-	if err := p.Base.ConfigureAndValidate(ctx, conf, p.opt); err != nil {
+	if err := p.ConfigureAndValidate(ctx, conf, p.opt); err != nil {
 		return err
 	}
 

@@ -56,7 +56,7 @@ func (p *processor) Configure(ctx map[string]interface{}, conf map[string]interf
 	p.opt.Retry_delay = 3
 	p.opt.Isodate = false
 	p.opt.GenerateId = false
-	return p.Base.ConfigureAndValidate(ctx, conf, p.opt)
+	return p.ConfigureAndValidate(ctx, conf, p.opt)
 }
 
 func (p *processor) Start(e veino.IPacket) error {

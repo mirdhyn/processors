@@ -72,7 +72,7 @@ func (p *processor) Configure(ctx map[string]interface{}, conf map[string]interf
 	p.Tag_on_failure = []string{"_grokparsefailure"}
 
 	var err error
-	if err := p.Base.ConfigureAndValidate(ctx, conf, p); err != nil {
+	if err := p.ConfigureAndValidate(ctx, conf, p); err != nil {
 		return err
 	}
 

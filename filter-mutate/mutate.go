@@ -80,7 +80,7 @@ type processor struct {
 }
 
 func (p *processor) Configure(ctx map[string]interface{}, conf map[string]interface{}) error {
-	return p.Base.ConfigureAndValidate(ctx, conf, p)
+	return p.ConfigureAndValidate(ctx, conf, p)
 }
 
 func (p *processor) Receive(e veino.IPacket) error {
