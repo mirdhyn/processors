@@ -4,26 +4,25 @@ import (
 	"os"
 	"strings"
 
-	"github.com/mitchellh/mapstructure"
+	"github.com/veino/processors"
 	"github.com/veino/veino"
 )
 
 var lines = map[string][]string{}
 
-func New(l veino.Logger) veino.Processor {
+func New() veino.Processor {
 	return &processor{}
 }
 
 type processor struct {
+	processors.Base
+
 	Path           string
 	Flush_interval interface{} // maybe a cron style or a number
 }
 
-func (p *processor) Configure(conf map[string]interface{}) error {
-	if err := mapstructure.Decode(conf, p); err != nil {
-		return err
-	}
-	return nil
+func (p *processor) Configure(ctx map[string]interface{}, conf map[string]interface{}) error {
+	return p.Base.ConfigureAndValidate(ctx, conf, p)
 }
 
 func (p *processor) Receive(e veino.IPacket) error {
@@ -47,13 +46,6 @@ func (p *processor) Tick(e veino.IPacket) error {
 	lines["global"] = []string{}
 	return nil
 }
-
-func (p *processor) Start(e veino.IPacket) error {
-	// If flush interval, register scheduler
-	return nil
-}
-
-func (p *processor) Stop(e veino.IPacket) error { return nil }
 
 func writeToFile(path string, content string) {
 	f, err := os.OpenFile(path, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0600)

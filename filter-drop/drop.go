@@ -4,18 +4,19 @@ package drop
 import (
 	"math/rand"
 
-	"github.com/mitchellh/mapstructure"
 	"github.com/veino/field"
+	"github.com/veino/processors"
 	"github.com/veino/veino"
 )
 
-func New(l veino.Logger) veino.Processor {
-	return &processor{}
+func New() veino.Processor {
+	return &processor{opt: &options{}}
 }
 
 type processor struct {
-	Send veino.PacketSender
-	opt  *options
+	processors.Base
+
+	opt *options
 }
 
 type options struct {
@@ -39,13 +40,9 @@ type options struct {
 	Percentage int
 }
 
-func (p *processor) Configure(conf map[string]interface{}) error {
-	cf := options{Percentage: 100}
-	if mapstructure.Decode(conf, &cf) != nil {
-		return nil
-	}
-	p.opt = &cf
-	return nil
+func (p *processor) Configure(ctx map[string]interface{}, conf map[string]interface{}) error {
+	p.opt.Percentage = 100
+	return p.Base.ConfigureAndValidate(ctx, conf, p.opt)
 }
 
 func (p *processor) Receive(e veino.IPacket) error {
@@ -63,9 +60,3 @@ func (p *processor) Receive(e veino.IPacket) error {
 	p.Send(e, 0)
 	return nil
 }
-
-func (p *processor) Tick(e veino.IPacket) error { return nil }
-
-func (p *processor) Start(e veino.IPacket) error { return nil }
-
-func (p *processor) Stop(e veino.IPacket) error { return nil }

@@ -7,20 +7,20 @@ import (
 	"strings"
 
 	"github.com/ChimeraCoder/anaconda"
-	"github.com/mitchellh/mapstructure"
 	"github.com/veino/field"
+	"github.com/veino/processors"
 	"github.com/veino/veino"
 )
 
-func New(l veino.Logger) veino.Processor {
-	return &processor{}
+func New() veino.Processor {
+	return &processor{opt: &options{}}
 }
 
 type processor struct {
-	Send      veino.PacketSender
-	NewPacket veino.PacketBuilder
-	opt       *options
-	stream    *anaconda.Stream
+	processors.Base
+
+	opt    *options
+	stream *anaconda.Stream
 }
 
 type options struct {
@@ -64,15 +64,11 @@ type options struct {
 	Tags []string
 }
 
-func (p *processor) Configure(data map[string]interface{}) error {
-	cf := options{Full_tweet: false, Ignore_retweets: false}
+func (p *processor) Configure(ctx map[string]interface{}, conf map[string]interface{}) error {
+	p.opt.Full_tweet = false
+	p.opt.Ignore_retweets = false
 
-	if err := mapstructure.Decode(data, &cf); err != nil {
-		return err
-	}
-	p.opt = &cf
-
-	return nil
+	return p.Base.ConfigureAndValidate(ctx, conf, p.opt)
 }
 
 func (p *processor) Start(e veino.IPacket) error {
@@ -106,9 +102,6 @@ func (p *processor) Stop(e veino.IPacket) error {
 	p.stream.Stop()
 	return nil
 }
-
-func (p *processor) Tick(e veino.IPacket) error    { return nil }
-func (p *processor) Receive(e veino.IPacket) error { return nil }
 
 func (p *processor) doStream(stream *anaconda.Stream, packet veino.IPacket, opt *options) {
 	for streamObj := range stream.C {

@@ -5,10 +5,9 @@ import (
 	"net/http"
 
 	"github.com/k0kubun/pp"
-	"github.com/mitchellh/mapstructure"
+	"github.com/veino/processors"
 	"github.com/veino/runtime/memory"
 	"github.com/veino/veino"
-	"gopkg.in/go-playground/validator.v8"
 )
 
 const (
@@ -18,8 +17,8 @@ const (
 	CODEC_JSON        string = "json"
 )
 
-func New(l veino.Logger) veino.Processor {
-	return &processor{logger: l}
+func New() veino.Processor {
+	return &processor{opt: &options{}}
 }
 
 type options struct {
@@ -27,23 +26,25 @@ type options struct {
 }
 
 type processor struct {
+	processors.Base
+
 	logger veino.Logger
 	Memory *memory.Memory
 	// WebHook *veino.WebHook
 	opt *options
 }
 
-func (p *processor) Configure(conf map[string]interface{}) error {
-	cf := options{Codec: CODEC_LINE}
-	if mapstructure.Decode(conf, &cf) != nil {
-		return nil
+func (p *processor) Configure(ctx map[string]interface{}, conf map[string]interface{}) error {
+	p.opt.Codec = CODEC_LINE
+	if err := p.Base.ConfigureAndValidate(ctx, conf, p.opt); err != nil {
+		return err
 	}
-	if cf.Codec == CODEC_RUBYDEBUG {
-		cf.Codec = CODEC_PRETTYPRINT
-	}
-	p.opt = &cf
 
-	return validator.New(&validator.Config{TagName: "validate"}).Struct(p.opt)
+	if p.opt.Codec == CODEC_RUBYDEBUG {
+		p.opt.Codec = CODEC_PRETTYPRINT
+	}
+
+	return nil
 }
 
 func (p *processor) Receive(e veino.IPacket) error {
@@ -68,8 +69,6 @@ func (p *processor) Receive(e veino.IPacket) error {
 	p.Memory.Set("", e.Fields().StringIndentNoTypeInfo(2))
 	return nil
 }
-
-func (p *processor) Tick(e veino.IPacket) error { return nil }
 
 func (p *processor) Start(e veino.IPacket) error {
 	// p.WebHook.Add("events", p.HttpHandler)

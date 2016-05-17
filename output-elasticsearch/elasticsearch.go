@@ -4,18 +4,20 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/mitchellh/mapstructure"
+	"github.com/veino/processors"
 	"github.com/veino/veino"
 	"gopkg.in/olivere/elastic.v2"
 )
 
 var lines = map[string][]string{}
 
-func New(l veino.Logger) veino.Processor {
-	return &processor{}
+func New() veino.Processor {
+	return &processor{opt: &options{}}
 }
 
 type processor struct {
+	processors.Base
+
 	client *elastic.Client
 	opt    *options
 }
@@ -29,15 +31,10 @@ type options struct {
 	Password string
 }
 
-func (p *processor) Configure(conf map[string]interface{}) error {
-	cf := options{Protocol: "http", Port: 9200}
-
-	if err := mapstructure.Decode(conf, &cf); err != nil {
-		return err
-	}
-	p.opt = &cf
-
-	return nil
+func (p *processor) Configure(ctx map[string]interface{}, conf map[string]interface{}) error {
+	p.opt.Protocol = "http"
+	p.opt.Port = 9200
+	return p.Base.ConfigureAndValidate(ctx, conf, p.opt)
 }
 
 func (p *processor) Receive(e veino.IPacket) error {
@@ -59,8 +56,6 @@ func (p *processor) Receive(e veino.IPacket) error {
 	return nil
 }
 
-func (p *processor) Tick(e veino.IPacket) error { return nil }
-
 func (p *processor) Start(e veino.IPacket) error {
 	var err error
 
@@ -77,5 +72,3 @@ func (p *processor) Start(e veino.IPacket) error {
 
 	return nil
 }
-
-func (p *processor) Stop(e veino.IPacket) error { return nil }

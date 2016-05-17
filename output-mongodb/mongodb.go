@@ -5,16 +5,18 @@ package mongodb
 // https://www.elastic.co/guide/en/logstash/current/plugins-outputs-mongodb.html
 
 import (
-	"github.com/mitchellh/mapstructure"
+	"github.com/veino/processors"
 	"github.com/veino/veino"
 	"gopkg.in/mgo.v2"
 )
 
-func New(l veino.Logger) veino.Processor {
-	return &processor{}
+func New() veino.Processor {
+	return &processor{opt: &options{}}
 }
 
 type processor struct {
+	processors.Base
+
 	session    *mgo.Session
 	collection *mgo.Collection
 	opt        *options
@@ -50,14 +52,11 @@ type options struct {
 	Uri string
 }
 
-func (p *processor) Configure(conf map[string]interface{}) error {
-	cf := options{Retry_delay: 3, Isodate: false, GenerateId: false}
-	if mapstructure.Decode(conf, &cf) != nil {
-		return nil
-	}
-
-	p.opt = &cf
-	return nil
+func (p *processor) Configure(ctx map[string]interface{}, conf map[string]interface{}) error {
+	p.opt.Retry_delay = 3
+	p.opt.Isodate = false
+	p.opt.GenerateId = false
+	return p.Base.ConfigureAndValidate(ctx, conf, p.opt)
 }
 
 func (p *processor) Start(e veino.IPacket) error {
@@ -80,7 +79,6 @@ func (p *processor) Receive(e veino.IPacket) error {
 	return err
 }
 
-func (p *processor) Tick(e veino.IPacket) error { return nil }
 func (p *processor) Stop(e veino.IPacket) error {
 	p.session.Close()
 	return nil

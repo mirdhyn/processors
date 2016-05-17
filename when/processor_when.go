@@ -5,14 +5,14 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/mitchellh/mapstructure"
+	"github.com/veino/processors"
 	"github.com/veino/veino"
 	"github.com/vjeantet/govaluate"
 )
 
 type processor struct {
-	Send                veino.PacketSender
-	logger              veino.Logger
+	processors.Base
+
 	opt                 *options
 	compiledExpressions map[int]*govaluate.EvaluableExpression
 }
@@ -21,21 +21,15 @@ type options struct {
 	Expressions map[int]string
 }
 
-func New(l veino.Logger) veino.Processor {
+func New() veino.Processor {
 	return &processor{
 		compiledExpressions: map[int]*govaluate.EvaluableExpression{},
-		logger:              l,
+		opt:                 &options{},
 	}
 }
 
-func (p *processor) Configure(conf map[string]interface{}) error {
-	cf := options{}
-	if mapstructure.Decode(conf, &cf) != nil {
-		return nil
-	}
-	p.opt = &cf
-
-	return nil
+func (p *processor) Configure(ctx map[string]interface{}, conf map[string]interface{}) error {
+	return p.Base.ConfigureAndValidate(ctx, conf, p.opt)
 }
 
 // comparison operators
@@ -60,7 +54,7 @@ func (p *processor) Receive(e veino.IPacket) error {
 
 		result, err := p.assertExpressionWithFields(order, expressionValue, e)
 		if err != nil {
-			p.logger.Printf("When processor evaluation error : %s\n", err.Error())
+			p.Logger.Printf("When processor evaluation error : %s\n", err.Error())
 			continue
 		}
 
@@ -71,12 +65,6 @@ func (p *processor) Receive(e veino.IPacket) error {
 	}
 	return nil
 }
-
-func (p *processor) Tick(e veino.IPacket) error { return nil }
-
-func (p *processor) Start(e veino.IPacket) error { return nil }
-
-func (p *processor) Stop(e veino.IPacket) error { return nil }
 
 // With Knetic/govaluate
 

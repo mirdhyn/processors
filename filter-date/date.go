@@ -3,17 +3,18 @@ package date
 import (
 	"time"
 
-	"github.com/mitchellh/mapstructure"
 	"github.com/veino/field"
+	"github.com/veino/processors"
 	"github.com/veino/veino"
 )
 
-func New(l veino.Logger) veino.Processor {
-	return &processor{}
+func New() veino.Processor {
+	return &processor{opt: &options{}}
 }
 
 type processor struct {
-	Send             veino.PacketSender
+	processors.Base
+
 	match_field_name string
 	match_patterns   []string
 	opt              *options
@@ -55,12 +56,13 @@ type options struct {
 	Timezone string
 }
 
-func (p *processor) Configure(conf map[string]interface{}) error {
-	cf := options{Target: "@timestamp", Tag_on_failure: []string{"_dateparsefailure"}}
-	if mapstructure.Decode(conf, &cf) != nil {
-		return nil
+func (p *processor) Configure(ctx map[string]interface{}, conf map[string]interface{}) error {
+	p.opt.Target = "@timestamp"
+	p.opt.Tag_on_failure = []string{"_dateparsefailure"}
+
+	if err := p.Base.ConfigureAndValidate(ctx, conf, p.opt); err != nil {
+		return err
 	}
-	p.opt = &cf
 
 	p.match_field_name = p.opt.Match[0]
 	p.match_patterns = p.opt.Match[1:]
@@ -104,9 +106,3 @@ func (p *processor) Receive(e veino.IPacket) error {
 	p.Send(e, 0)
 	return nil
 }
-
-func (p *processor) Tick(e veino.IPacket) error { return nil }
-
-func (p *processor) Start(e veino.IPacket) error { return nil }
-
-func (p *processor) Stop(e veino.IPacket) error { return nil }

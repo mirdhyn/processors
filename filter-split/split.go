@@ -2,8 +2,8 @@
 package split
 
 import (
-	"github.com/mitchellh/mapstructure"
 	"github.com/veino/field"
+	"github.com/veino/processors"
 	"github.com/veino/veino"
 )
 
@@ -12,13 +12,12 @@ const (
 	PORT_ERROR   = 1
 )
 
-func New(l veino.Logger) veino.Processor {
+func New() veino.Processor {
 	return &processor{}
 }
 
 type processor struct {
-	Send      veino.PacketSender
-	NewPacket veino.PacketBuilder
+	processors.Base
 
 	// The field which value is split by the terminator
 	Field string
@@ -44,11 +43,8 @@ type processor struct {
 	Remove_Tag []string
 }
 
-func (p *processor) Configure(conf map[string]interface{}) error {
-	if err := mapstructure.Decode(conf, p); err != nil {
-		return err
-	}
-	return nil
+func (p *processor) Configure(ctx map[string]interface{}, conf map[string]interface{}) error {
+	return p.Base.ConfigureAndValidate(ctx, conf, p)
 }
 
 func (p *processor) Receive(e veino.IPacket) error {
@@ -82,9 +78,3 @@ func (p *processor) Receive(e veino.IPacket) error {
 
 	return nil
 }
-
-func (p *processor) Tick(e veino.IPacket) error { return nil }
-
-func (p *processor) Start(e veino.IPacket) error { return nil }
-
-func (p *processor) Stop(e veino.IPacket) error { return nil }

@@ -4,13 +4,13 @@ package httppoller
 import (
 	"encoding/json"
 
-	"github.com/mitchellh/mapstructure"
 	"github.com/parnurzeal/gorequest"
+	"github.com/veino/processors"
 	"github.com/veino/veino"
 )
 
-func New(l veino.Logger) veino.Processor {
-	return &processor{logger: l}
+func New() veino.Processor {
+	return &processor{opt: &options{}}
 }
 
 type options struct {
@@ -19,27 +19,22 @@ type options struct {
 }
 
 type processor struct {
-	Send      veino.PacketSender
-	logger    veino.Logger
-	NewPacket veino.PacketBuilder
-	opt       *options
-	request   *gorequest.SuperAgent
+	processors.Base
+
+	logger  veino.Logger
+	opt     *options
+	request *gorequest.SuperAgent
 }
 
-func (p *processor) Configure(conf map[string]interface{}) error {
-	cf := options{}
-	if mapstructure.Decode(conf, &cf) != nil {
-		return nil
-	}
-	p.opt = &cf
-	return nil
+func (p *processor) Configure(ctx map[string]interface{}, conf map[string]interface{}) error {
+	return p.Base.ConfigureAndValidate(ctx, conf, p.opt)
 }
 
 func (p *processor) Start(e veino.IPacket) error {
 	p.request = gorequest.New()
 	return nil
 }
-func (p *processor) Stop(e veino.IPacket) error { return nil }
+
 func (p *processor) Tick(e veino.IPacket) error {
 	var (
 		errs []error
@@ -70,5 +65,3 @@ func (p *processor) Tick(e veino.IPacket) error {
 
 	return nil
 }
-
-func (p *processor) Receive(e veino.IPacket) error { return nil }

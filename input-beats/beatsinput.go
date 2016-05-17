@@ -1,21 +1,20 @@
 package beatsinput
 
 import (
-	"github.com/mitchellh/mapstructure"
+	"github.com/veino/processors"
 	"github.com/veino/veino"
 )
 
-func New(l veino.Logger) veino.Processor {
-	return &processor{Logger: l}
+func New() veino.Processor {
+	return &processor{opt: &options{}}
 }
 
 type processor struct {
-	Logger    veino.Logger
-	Send      veino.PacketSender
-	NewPacket veino.PacketBuilder
+	processors.Base
 
-	opt *options
-	q   chan bool
+	Logger veino.Logger
+	opt    *options
+	q      chan bool
 }
 
 type options struct {
@@ -72,21 +71,14 @@ type options struct {
 	Type string
 }
 
-func (p *processor) Configure(conf map[string]interface{}) error {
-	cf := options{
-		Congestion_threshold: 5,
-		Host:                 "0.0.0.0",
-		Port:                 5044,
-		Ssl:                  false,
-		Ssl_verify_mode:      "none",
-	}
+func (p *processor) Configure(ctx map[string]interface{}, conf map[string]interface{}) error {
+	p.opt.Congestion_threshold = 5
+	p.opt.Host = "0.0.0.0"
+	p.opt.Port = 5044
+	p.opt.Ssl = false
+	p.opt.Ssl_verify_mode = "none"
 
-	if mapstructure.Decode(conf, &cf) != nil {
-		return nil
-	}
-	p.opt = &cf
-
-	return nil
+	return p.Base.ConfigureAndValidate(ctx, conf, p.opt)
 }
 
 func (p *processor) Start(e veino.IPacket) error {
@@ -100,6 +92,3 @@ func (p *processor) Stop(e veino.IPacket) error {
 	<-p.q
 	return nil
 }
-
-func (p *processor) Tick(e veino.IPacket) error    { return nil }
-func (p *processor) Receive(e veino.IPacket) error { return nil }

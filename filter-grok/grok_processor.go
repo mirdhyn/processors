@@ -5,6 +5,7 @@ import (
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/veino/field"
+	"github.com/veino/processors"
 	"github.com/veino/veino"
 	"github.com/vjeantet/grok"
 )
@@ -13,12 +14,13 @@ const (
 	PORT_SUCCESS = 0
 )
 
-func New(l veino.Logger) veino.Processor {
+func New() veino.Processor {
 	return &processor{}
 }
 
 type processor struct {
-	Send veino.PacketSender
+	processors.Base
+
 	grok *grok.Grok
 
 	// If this filter is successful, add any arbitrary fields to this event. Field names can
@@ -64,13 +66,13 @@ type processor struct {
 	Tag_on_failure []string
 }
 
-func (p *processor) Configure(conf map[string]interface{}) error {
+func (p *processor) Configure(ctx map[string]interface{}, conf map[string]interface{}) error {
 	p.Named_captures_only = true
 	p.Break_on_match = true
 	p.Tag_on_failure = []string{"_grokparsefailure"}
 
 	var err error
-	if err = mapstructure.Decode(conf, p); err != nil {
+	if err := p.Base.ConfigureAndValidate(ctx, conf, p); err != nil {
 		return err
 	}
 

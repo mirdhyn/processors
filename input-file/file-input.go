@@ -8,23 +8,21 @@ import (
 	"sync"
 	"time"
 
-	"github.com/mitchellh/mapstructure"
 	"github.com/veino/field"
+	"github.com/veino/processors"
 	"github.com/veino/veino"
-	"gopkg.in/go-playground/validator.v8"
 
 	"github.com/hpcloud/tail"
 	"github.com/hpcloud/tail/watch"
 )
 
-func New(l veino.Logger) veino.Processor {
-	return &processor{Logger: l}
+func New() veino.Processor {
+	return &processor{opt: &options{}}
 }
 
 type processor struct {
-	Logger              veino.Logger
-	Send                veino.PacketSender
-	NewPacket           veino.PacketBuilder
+	processors.Base
+
 	opt                 *options
 	sinceDBInfos        map[string]*sinceDBInfo
 	sinceDBLastInfosRaw []byte
@@ -52,24 +50,17 @@ type options struct {
 	Type                   string
 }
 
-func (p *processor) Configure(conf map[string]interface{}) error {
-	cf := options{
-		Start_position:         "end",
-		Sincedb_path:           ".sincedb.json",
-		Sincedb_write_interval: 15,
-		Stat_interval:          1,
-	}
+func (p *processor) Configure(ctx map[string]interface{}, conf map[string]interface{}) error {
+	p.opt.Start_position = "end"
+	p.opt.Sincedb_path = ".sincedb.json"
+	p.opt.Sincedb_write_interval = 15
+	p.opt.Stat_interval = 1
 
 	if usr, err := user.Current(); err == nil {
-		cf.Sincedb_path = usr.HomeDir + "/" + cf.Sincedb_path
+		p.opt.Sincedb_path = usr.HomeDir + "/" + p.opt.Sincedb_path
 	}
 
-	if mapstructure.Decode(conf, &cf) != nil {
-		return nil
-	}
-	p.opt = &cf
-
-	return validator.New(&validator.Config{TagName: "validate"}).Struct(p.opt)
+	return p.Base.ConfigureAndValidate(ctx, conf, p.opt)
 }
 func (p *processor) Start(e veino.IPacket) error {
 	watch.POLL_DURATION = time.Second * time.Duration(p.opt.Stat_interval)
@@ -114,8 +105,8 @@ func (p *processor) Stop(e veino.IPacket) error {
 	return nil
 }
 
-func (p *processor) Tick(e veino.IPacket) error    { return nil }
-func (p *processor) Receive(e veino.IPacket) error { return nil }
+// func (p *processor) Tick(e veino.IPacket) error    { return nil }
+// func (p *processor) Receive(e veino.IPacket) error { return nil }
 
 func (p *processor) tailFile(path string, q chan bool) error {
 	defer p.wg.Done()
