@@ -21,7 +21,6 @@ type options struct {
 type processor struct {
 	processors.Base
 
-	logger  veino.Logger
 	opt     *options
 	request *gorequest.SuperAgent
 }
@@ -46,16 +45,16 @@ func (p *processor) Tick(e veino.IPacket) error {
 	case "GET":
 		resp, body, errs = p.request.Get(p.opt.Url).End()
 	default:
-		p.logger.Printf("Method %s not implemented", p.opt.Method)
+		p.Logger.Printf("Method %s not implemented", p.opt.Method)
 		return nil
 	}
 
 	if errs != nil {
-		p.logger.Printf("while http requesting %s : %#v", p.opt.Url, errs)
+		p.Logger.Printf("while http requesting %s : %#v", p.opt.Url, errs)
 		return nil
 	}
 	if resp.StatusCode >= 400 {
-		p.logger.Printf("http response code %s : %d (%s)", p.opt.Url, resp.StatusCode, resp.Status)
+		p.Logger.Printf("http response code %s : %d (%s)", p.opt.Url, resp.StatusCode, resp.Status)
 		return nil
 	}
 

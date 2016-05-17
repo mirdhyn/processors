@@ -12,9 +12,8 @@ func New() veino.Processor {
 type processor struct {
 	processors.Base
 
-	Logger veino.Logger
-	opt    *options
-	q      chan bool
+	opt *options
+	q   chan bool
 }
 
 type options struct {

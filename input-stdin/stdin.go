@@ -33,9 +33,8 @@ type options struct {
 type processor struct {
 	processors.Base
 
-	logger veino.Logger
-	opt    *options
-	q      chan bool
+	opt *options
+	q   chan bool
 }
 
 func (p *processor) Configure(ctx map[string]interface{}, conf map[string]interface{}) error {
@@ -58,7 +57,7 @@ func (p *processor) Start(e veino.IPacket) error {
 
 	host, err := os.Hostname()
 	if err != nil {
-		p.logger.Printf("can not get hostname : %s", err.Error())
+		p.Logger.Printf("can not get hostname : %s", err.Error())
 	}
 
 	go func(ch chan string) {

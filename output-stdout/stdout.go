@@ -28,7 +28,6 @@ type options struct {
 type processor struct {
 	processors.Base
 
-	logger veino.Logger
 	Memory *memory.Memory
 	// WebHook *veino.WebHook
 	opt *options
@@ -63,7 +62,7 @@ func (p *processor) Receive(e veino.IPacket) error {
 		pp.Printf("%s\n", e.Fields())
 		break
 	default:
-		p.logger.Printf("unknow codec %s", p.opt.Codec)
+		p.Logger.Printf("unknow codec %s", p.opt.Codec)
 	}
 
 	p.Memory.Set("", e.Fields().StringIndentNoTypeInfo(2))

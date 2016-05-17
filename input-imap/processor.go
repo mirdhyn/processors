@@ -13,7 +13,6 @@ func New() veino.Processor {
 type processor struct {
 	processors.Base
 
-	logger  veino.Logger
 	config  *watch.Flags
 	watcher *watch.Watch
 }
@@ -30,7 +29,7 @@ func (p *processor) Configure(ctx map[string]interface{}, conf map[string]interf
 }
 
 func (p *processor) Stop(e veino.IPacket) error {
-	p.logger.Printf("imap input - closing connection...")
+	p.Logger.Printf("imap input - closing connection...")
 	p.watcher.Stop()
 
 	return nil
