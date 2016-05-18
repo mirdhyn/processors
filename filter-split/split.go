@@ -2,7 +2,6 @@
 package split
 
 import (
-	"github.com/veino/field"
 	"github.com/veino/processors"
 	"github.com/veino/veino"
 )
@@ -64,7 +63,7 @@ func (p *processor) Receive(e veino.IPacket) error {
 		cp, _ := e.Fields().Copy()
 		cp.SetValueForPath(split, p.Target)
 
-		field.ProcessCommonFields2(&cp,
+		processors.ProcessCommonFields2(&cp,
 			p.Add_field,
 			p.Add_tag,
 			p.Remove_field,

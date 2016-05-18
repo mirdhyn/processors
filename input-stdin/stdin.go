@@ -5,7 +5,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/veino/field"
 	"github.com/veino/processors"
 	"github.com/veino/veino"
 )
@@ -69,7 +68,7 @@ func (p *processor) Start(e veino.IPacket) error {
 					"host": host,
 				})
 
-				field.ProcessCommonFields(ne.Fields(), p.opt.Add_field, p.opt.Tags, p.opt.Type)
+				processors.ProcessCommonFields(ne.Fields(), p.opt.Add_field, p.opt.Tags, p.opt.Type)
 				p.Send(ne)
 
 			case <-time.After(5 * time.Second):

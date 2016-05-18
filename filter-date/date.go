@@ -3,7 +3,6 @@ package date
 import (
 	"time"
 
-	"github.com/veino/field"
 	"github.com/veino/processors"
 	"github.com/veino/veino"
 )
@@ -94,13 +93,13 @@ func (p *processor) Receive(e veino.IPacket) error {
 
 			dated = true
 			e.Fields().SetValueForPath(t.Format(veino.VeinoTime), p.opt.Target)
-			field.ProcessCommonFields(e.Fields(), p.opt.Add_field, p.opt.Tags, "")
+			processors.ProcessCommonFields(e.Fields(), p.opt.Add_field, p.opt.Tags, "")
 			break
 		}
 	}
 
 	if dated == false {
-		field.AddTags(p.opt.Tag_on_failure, e.Fields())
+		processors.AddTags(p.opt.Tag_on_failure, e.Fields())
 	}
 
 	p.Send(e, 0)

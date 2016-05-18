@@ -7,7 +7,6 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/veino/field"
 	"github.com/veino/processors"
 	"github.com/veino/veino"
 )
@@ -54,7 +53,7 @@ func (p *processor) Tick(e veino.IPacket) error {
 	e.Fields().SetValueForPath(p.opt.Command, "command")
 	e.Fields().SetValueForPath(strings.Join(p.opt.Args, ", "), "args")
 
-	field.ProcessCommonFields(e.Fields(), p.opt.Add_field, p.opt.Tags, p.opt.Type)
+	processors.ProcessCommonFields(e.Fields(), p.opt.Add_field, p.opt.Tags, p.opt.Type)
 	p.Send(e, 0)
 
 	return nil

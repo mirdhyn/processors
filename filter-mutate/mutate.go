@@ -2,7 +2,6 @@
 package mutate
 
 import (
-	"github.com/veino/field"
 	"github.com/veino/processors"
 	"github.com/veino/veino"
 )
@@ -66,7 +65,7 @@ type processor struct {
 	// Split a field to an array using a separator character. Only works on string fields
 	Split map[string]string
 
-	// Strip whitespace from field. NOTE: this only works on leading and trailing whitespace
+	// Strip whitespace from processors. NOTE: this only works on leading and trailing whitespace
 	Strip []string
 
 	// Update an existing field with a new value. If the field does not exist, then no action will be taken
@@ -84,22 +83,22 @@ func (p *processor) Configure(ctx map[string]interface{}, conf map[string]interf
 }
 
 func (p *processor) Receive(e veino.IPacket) error {
-	field.AddFields(p.Add_field, e.Fields())
-	field.AddTags(p.Add_tag, e.Fields())
-	field.UpdateFields(p.Update, e.Fields())
-	field.UpdateFields(p.Replace, e.Fields())
-	field.RemoveFields(p.Remove_field, e.Fields())
-	field.RenameFields(p.Rename, e.Fields())
-	field.UpperCaseFields(p.Uppercase, e.Fields())
-	field.LowerCaseFields(p.Lowercase, e.Fields())
-	field.RemoveAllButFields(p.Remove_all_but, e.Fields())
-	field.Convert(p.Convert, e.Fields())
-	field.Join(p.Join, e.Fields())
-	field.RemoveTags(p.Remove_tag, e.Fields())
-	field.Gsub(p.Gsub, e.Fields())
-	field.Split(p.Split, e.Fields())
-	field.Strip(p.Strip, e.Fields())
-	field.Merge(p.Merge, e.Fields())
+	processors.AddFields(p.Add_field, e.Fields())
+	processors.AddTags(p.Add_tag, e.Fields())
+	processors.UpdateFields(p.Update, e.Fields())
+	processors.UpdateFields(p.Replace, e.Fields())
+	processors.RemoveFields(p.Remove_field, e.Fields())
+	processors.RenameFields(p.Rename, e.Fields())
+	processors.UpperCaseFields(p.Uppercase, e.Fields())
+	processors.LowerCaseFields(p.Lowercase, e.Fields())
+	processors.RemoveAllButFields(p.Remove_all_but, e.Fields())
+	processors.Convert(p.Convert, e.Fields())
+	processors.Join(p.Join, e.Fields())
+	processors.RemoveTags(p.Remove_tag, e.Fields())
+	processors.Gsub(p.Gsub, e.Fields())
+	processors.Split(p.Split, e.Fields())
+	processors.Strip(p.Strip, e.Fields())
+	processors.Merge(p.Merge, e.Fields())
 
 	p.Send(e, PORT_SUCCESS)
 

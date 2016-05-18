@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/ChimeraCoder/anaconda"
-	"github.com/veino/field"
 	"github.com/veino/processors"
 	"github.com/veino/veino"
 )
@@ -153,9 +152,9 @@ func (p *processor) doStream(stream *anaconda.Stream, packet veino.IPacket, opt 
 			}
 
 			e := p.NewPacket(t.Text, r)
-			field.AddFields(opt.Add_field, e.Fields())
+			processors.AddFields(opt.Add_field, e.Fields())
 			if len(opt.Tags) > 0 {
-				field.AddTags(opt.Tags, e.Fields())
+				processors.AddTags(opt.Tags, e.Fields())
 			}
 			p.Send(e, 0)
 		default:

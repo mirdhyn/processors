@@ -8,7 +8,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/veino/field"
 	"github.com/veino/processors"
 	"github.com/veino/veino"
 
@@ -167,7 +166,7 @@ func (p *processor) tailFile(path string, q chan bool) error {
 
 		since.Offset, _ = t.Tell()
 
-		field.ProcessCommonFields(e.Fields(), p.opt.Add_field, p.opt.Tags, p.opt.Type)
+		processors.ProcessCommonFields(e.Fields(), p.opt.Add_field, p.opt.Tags, p.opt.Type)
 		p.Send(e)
 		p.checkSaveSinceDBInfos()
 	}

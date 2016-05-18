@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/mitchellh/mapstructure"
-	"github.com/veino/field"
 	"github.com/veino/processors"
 	"github.com/veino/veino"
 	"github.com/vjeantet/grok"
@@ -111,12 +110,12 @@ func (p *processor) Receive(e veino.IPacket) error {
 	}
 
 	if groked {
-		field.AddFields(p.Add_field, e.Fields())
-		field.RemoveFields(p.Remove_field, e.Fields())
+		processors.AddFields(p.Add_field, e.Fields())
+		processors.RemoveFields(p.Remove_field, e.Fields())
 		if len(p.Add_tag) > 0 {
-			field.AddTags(p.Add_tag, e.Fields())
+			processors.AddTags(p.Add_tag, e.Fields())
 		}
-		field.RemoveTags(p.Remove_tag, e.Fields())
+		processors.RemoveTags(p.Remove_tag, e.Fields())
 
 	}
 

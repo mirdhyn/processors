@@ -4,7 +4,6 @@ package drop
 import (
 	"math/rand"
 
-	"github.com/veino/field"
 	"github.com/veino/processors"
 	"github.com/veino/veino"
 )
@@ -51,7 +50,7 @@ func (p *processor) Receive(e veino.IPacket) error {
 		return nil
 	}
 
-	field.ProcessCommonFields2(e.Fields(),
+	processors.ProcessCommonFields2(e.Fields(),
 		p.opt.Add_field,
 		p.opt.Add_tag,
 		p.opt.Remove_field,
