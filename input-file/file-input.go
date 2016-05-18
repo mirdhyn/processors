@@ -49,7 +49,7 @@ type options struct {
 	Type                   string
 }
 
-func (p *processor) Configure(ctx map[string]interface{}, conf map[string]interface{}) error {
+func (p *processor) Configure(ctx veino.ProcessorContext, conf map[string]interface{}) error {
 	p.opt.Start_position = "end"
 	p.opt.Sincedb_path = ".sincedb.json"
 	p.opt.Sincedb_write_interval = 15

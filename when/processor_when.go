@@ -28,7 +28,7 @@ func New() veino.Processor {
 	}
 }
 
-func (p *processor) Configure(ctx map[string]interface{}, conf map[string]interface{}) error {
+func (p *processor) Configure(ctx veino.ProcessorContext, conf map[string]interface{}) error {
 	return p.ConfigureAndValidate(ctx, conf, p.opt)
 }
 

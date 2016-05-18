@@ -70,7 +70,7 @@ type options struct {
 	Type string
 }
 
-func (p *processor) Configure(ctx map[string]interface{}, conf map[string]interface{}) error {
+func (p *processor) Configure(ctx veino.ProcessorContext, conf map[string]interface{}) error {
 	p.opt.Congestion_threshold = 5
 	p.opt.Host = "0.0.0.0"
 	p.opt.Port = 5044

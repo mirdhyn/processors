@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/veino/field"
+	"github.com/veino/processors"
 )
 
 func (p *processor) serve() error {
@@ -107,7 +107,7 @@ func (p *processor) clientServe(c net.Conn, wg *sync.WaitGroup, clientTerm chan 
 				msg = txt.(string)
 			}
 			e := p.NewPacket(msg, fields)
-			field.ProcessCommonFields(e.Fields(), p.opt.Add_field, p.opt.Tags, p.opt.Type)
+			processors.ProcessCommonFields(e.Fields(), p.opt.Add_field, p.opt.Tags, p.opt.Type)
 			p.Send(e)
 		case <-clientTerm:
 			c.SetReadDeadline(time.Now())

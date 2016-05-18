@@ -21,7 +21,7 @@ type processor struct {
 	Flush_interval interface{} // maybe a cron style or a number
 }
 
-func (p *processor) Configure(ctx map[string]interface{}, conf map[string]interface{}) error {
+func (p *processor) Configure(ctx veino.ProcessorContext, conf map[string]interface{}) error {
 	return p.ConfigureAndValidate(ctx, conf, p)
 }
 

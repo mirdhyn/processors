@@ -33,7 +33,7 @@ type processor struct {
 	opt *options
 }
 
-func (p *processor) Configure(ctx map[string]interface{}, conf map[string]interface{}) error {
+func (p *processor) Configure(ctx veino.ProcessorContext, conf map[string]interface{}) error {
 	p.opt.Codec = CODEC_LINE
 	if err := p.ConfigureAndValidate(ctx, conf, p.opt); err != nil {
 		return err

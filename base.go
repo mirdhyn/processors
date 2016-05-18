@@ -12,25 +12,35 @@ type Base struct {
 	Logger    logger
 }
 
-func (b *Base) ConfigureAndValidate(ctx map[string]interface{}, conf map[string]interface{}, rawVal interface{}) error {
+func (b *Base) Configure(ctx veino.ProcessorContext, conf map[string]interface{}) error { return nil }
+
+func (b *Base) Receive(e veino.IPacket) error { return nil }
+
+func (b *Base) Tick(e veino.IPacket) error { return nil }
+
+func (b *Base) Start(e veino.IPacket) error { return nil }
+
+func (b *Base) Stop(e veino.IPacket) error { return nil }
+
+func (b *Base) ConfigureAndValidate(ctx veino.ProcessorContext, conf map[string]interface{}, rawVal interface{}) error {
 
 	// Logger
-	if val, ok := ctx["logger"]; ok && val != nil {
-		b.Logger = ctx["logger"].(logger)
+	if ctx.Logger != nil {
+		b.Logger = ctx.Logger()
 	} else {
 		b.Logger = DefaultLogger
 	}
 
 	// Packet Sender func
-	if val, ok := ctx["PacketSender"]; ok && val != nil {
-		b.Send = ctx["PacketSender"].(func(veino.IPacket, ...int) bool)
+	if ctx.PacketSender != nil {
+		b.Send = ctx.PacketSender()
 	} else {
 		// TODO set a dummy packetSender
 	}
 
 	// Packet Builder func
-	if val, ok := ctx["PacketBuilder"]; ok && val != nil {
-		b.NewPacket = ctx["PacketBuilder"].(func(string, map[string]interface{}) veino.IPacket)
+	if ctx.PacketBuilder != nil {
+		b.NewPacket = ctx.PacketBuilder()
 	} else {
 		// TODO set a dummy PacketBuilder
 	}
@@ -47,13 +57,3 @@ func (b *Base) ConfigureAndValidate(ctx map[string]interface{}, conf map[string]
 
 	return nil
 }
-
-func (b *Base) Configure(ctx map[string]interface{}, conf map[string]interface{}) error { return nil }
-
-func (b *Base) Receive(e veino.IPacket) error { return nil }
-
-func (b *Base) Tick(e veino.IPacket) error { return nil }
-
-func (b *Base) Start(e veino.IPacket) error { return nil }
-
-func (b *Base) Stop(e veino.IPacket) error { return nil }

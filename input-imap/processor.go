@@ -17,7 +17,7 @@ type processor struct {
 	watcher *watch.Watch
 }
 
-func (p *processor) Configure(ctx map[string]interface{}, conf map[string]interface{}) error {
+func (p *processor) Configure(ctx veino.ProcessorContext, conf map[string]interface{}) error {
 	p.config = watch.NewFlags()
 	p.config.Host = conf["host"].(string)
 	p.config.Port = uint(conf["port"].(float64))
