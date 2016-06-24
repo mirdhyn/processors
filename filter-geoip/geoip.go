@@ -218,14 +218,14 @@ func (p *processor) Receive(e veino.IPacket) error {
 }
 
 func (p *processor) load(databases interface{}) (err error) {
+	if databases == nil {
+		return errors.New("no valid GeoIP database found")
+	}
 	for name, path := range databases.(map[string]interface{}) {
 		p.databases[name], err = geoip2.Open(path.(string))
 		if err != nil {
 			return err
 		}
-	}
-	if len(p.databases) == 0 {
-		return errors.New("no valid GeoIP database found")
 	}
 	return nil
 }
