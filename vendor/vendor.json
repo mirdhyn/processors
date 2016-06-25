@@ -99,6 +99,12 @@
 			"revisionTime": "2016-04-28T00:30:50Z"
 		},
 		{
+			"checksumSHA1": "Y328JgHgMALOH5QwFQm7VnyrNdI=",
+			"path": "github.com/hraban/lrucache",
+			"revision": "a1cd14943f73930436f5affeb56ddeb0ff09ccd9",
+			"revisionTime": "2015-03-09T11:20:52Z"
+		},
+		{
 			"checksumSHA1": "QVALLtQ7n6pt+YJiFrnng1O86PI=",
 			"path": "github.com/k0kubun/pp",
 			"revision": "36d5366f4ec038f9a76dd85c7b29074089bb9b9e",
@@ -135,6 +141,18 @@
 			"revisionTime": "2013-12-21T20:05:32Z"
 		},
 		{
+			"checksumSHA1": "tths50mGvnvWps6KZLmKLvkLVI0=",
+			"path": "github.com/oschwald/geoip2-golang",
+			"revision": "b8dbdc368b6db46de50f7eecf7a7a31b4822aa00",
+			"revisionTime": "2016-05-06T03:10:17Z"
+		},
+		{
+			"checksumSHA1": "y9YgEQFQuCAt3Nw2hSDbKQD3kx8=",
+			"path": "github.com/oschwald/maxminddb-golang",
+			"revision": "03a3feaec4e514002b446197c10e8ee50e39574c",
+			"revisionTime": "2016-05-23T02:15:51Z"
+		},
+		{
 			"checksumSHA1": "tL0pxXs1jWzOSnK30Ke+I7sc1CM=",
 			"path": "github.com/parnurzeal/gorequest",
 			"revision": "c4a74a6708c98dafe692472ca01d6390d6d2ab4e",
@@ -145,6 +163,12 @@
 			"path": "github.com/sloonz/go-qprintable",
 			"revision": "775b3a4592d5bfc47b0ba398ec0d4dba018e5926",
 			"revisionTime": "2016-02-03T16:03:05Z"
+		},
+		{
+			"checksumSHA1": "rKV8YLkXpeNG1Oix8hlYqVsEFb4=",
+			"path": "github.com/streadway/amqp",
+			"revision": "2e25825abdbd7752ff08b270d313b93519a0a232",
+			"revisionTime": "2016-03-11T21:55:03Z"
 		},
 		{
 			"checksumSHA1": "yfYAIowXr2aRtR/LawlJiA/Ghtg=",
