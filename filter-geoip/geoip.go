@@ -33,6 +33,23 @@ type options struct {
 	// Tags can be dynamic and include parts of the event using the %{field} syntax.
 	AddTag []string `mapstructure:"add_tag"`
 
+	// Path to the GeoIP database files, keyed by geoip_type.
+	// City database
+	Database string `mapstructure:"database"`
+
+	// Map of paths to the GeoIP database files, keyed by geoip_type.
+	// Country, City, ASN, ISP and organization databases are supported.
+	Databases map[string]string `mapstructure:"databases"`
+
+	// An array of geoip fields to be included in the event.
+	// Possible fields depend on the database type. By default, all geoip fields are included in the event.
+	Fields []string `mapstructure:"fields"`
+
+	// Cache size
+	// default 1000
+	LruCacheSize int64 `mapstructure:"lru_cache_size"`
+	CacheSize    int64 `mapstructure:"cache_size"`
+
 	// If this filter is successful, remove arbitrary fields from this event.
 	RemoveField []string `mapstructure:"remove_field"`
 
@@ -40,16 +57,8 @@ type options struct {
 	// Tags can be dynamic and include parts of the event using the %{field} syntax
 	RemoveTag []string `mapstructure:"remove_tag"`
 
-	// Map of paths to the GeoIP database files, keyed by geoip_type.
-	// Country, City, ASN, ISP and organization databases are supported.
-	Databases map[string]string `mapstructure:"databases"`
-
 	// The field containing the IP address or hostname to map via geoip.
-	Source string `mapstructure:"source"`
-
-	// An array of geoip fields to be included in the event.
-	// Possible fields depend on the database type. By default, all geoip fields are included in the event.
-	Fields []string `mapstructure:"fields"`
+	Source string `mapstructure:"source" validate:"required"`
 
 	// Define the target field for placing the parsed data. If this setting is omitted,
 	// the geoip data will be stored at the root (top level) of the event
@@ -57,9 +66,6 @@ type options struct {
 
 	// Language to use for city/region/continent names
 	Language string `mapstructure:"language"`
-
-	// Cache size
-	CacheSize int64 `mapstructure:"cache_size"`
 }
 
 type geoipRecords struct {
@@ -89,15 +95,25 @@ func (p *processor) Configure(ctx veino.ProcessorContext, conf map[string]interf
 		},
 		Language:  "en",
 		CacheSize: 1000,
+		Target:    "geoip",
+		Databases: map[string]string{},
 	}
 	p.opt = &defaults
 
 	err := p.ConfigureAndValidate(ctx, conf, p.opt)
 
+	if p.opt.LruCacheSize > 0 {
+		p.opt.CacheSize = p.opt.LruCacheSize
+	}
+
+	p.cache = lrucache.New(p.opt.CacheSize)
+	p.databases = map[string]*geoip2.Reader{}
+
 	if err == nil {
 
-		p.cache = lrucache.New(p.opt.CacheSize)
-		p.databases = map[string]*geoip2.Reader{}
+		if p.opt.Database != "" {
+			p.opt.Databases["city"] = p.opt.Database
+		}
 
 		err = p.load(p.opt.Databases)
 		if err != nil {
@@ -205,7 +221,7 @@ func (p *processor) Receive(e veino.IPacket) error {
 		}
 	}
 
-	if len(p.opt.Target) > 0 {
+	if p.opt.Target != "" {
 		e.Fields().SetValueForPath(data, p.opt.Target)
 	} else {
 		for k, v := range data {
@@ -247,18 +263,20 @@ func (p *processor) getInfo() func(ip string) (lrucache.Cacheable, error) {
 
 		for name, db := range p.databases {
 			switch strings.ToLower(name) {
-			case "city":
-				p.Logger.Println("-=-=-=-")
-				if record, err := db.City(netIP); err == nil {
-					records.city = record
-				}
 			case "isp":
 				if record, err := db.ISP(netIP); err == nil {
 					records.isp = record
 				}
-				//case "country":
-				//case "domain":
-				//case "anonymousip":
+
+			//case "country":
+			//case "domain":
+			//case "anonymousip":
+
+			default:
+				p.Logger.Println("-=-=-=-")
+				if record, err := db.City(netIP); err == nil {
+					records.city = record
+				}
 			}
 		}
 		return records, nil
