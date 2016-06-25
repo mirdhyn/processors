@@ -2,6 +2,7 @@ package geoip
 
 import (
 	"errors"
+	"fmt"
 	"net"
 	"strings"
 
@@ -42,7 +43,7 @@ type options struct {
 
 	// Map of paths to the GeoIP database files, keyed by geoip_type.
 	// Country, City, ASN, ISP and organization databases are supported.
-	Database map[string]string `mapstructure:"database"`
+	Databases map[string]string `mapstructure:"databases"`
 
 	// The field containing the IP address or hostname to map via geoip.
 	Source string `mapstructure:"source"`
@@ -93,13 +94,16 @@ func (p *processor) Configure(ctx veino.ProcessorContext, conf map[string]interf
 
 	p.cache = lrucache.New(p.opt.CacheSize)
 	p.databases = map[string]*geoip2.Reader{}
-	p.load()
-	return p.ConfigureAndValidate(ctx, conf, p.opt)
 
+	if err := p.load(conf["databases"]); err != nil {
+		processors.DefaultLogger.Fatalln(err)
+	}
+	return p.ConfigureAndValidate(ctx, conf, p.opt)
 }
 
 func (p *processor) Receive(e veino.IPacket) error {
 	ip, err := e.Fields().ValueForPathString(p.opt.Source)
+	fmt.Println(ip)
 	if err != nil {
 		return err
 	}
@@ -112,10 +116,12 @@ func (p *processor) Receive(e veino.IPacket) error {
 	}
 
 	geoip := records.(geoipRecords)
+	fmt.Println(geoip)
 
 	data := make(map[string]interface{})
 	lang := p.opt.Language
 
+	fmt.Println(p.opt.Fields)
 	for _, field := range p.opt.Fields {
 		switch field {
 		// City database
@@ -192,7 +198,7 @@ func (p *processor) Receive(e veino.IPacket) error {
 		}
 	}
 
-	if p.opt.Target != "" {
+	if len(p.opt.Target) > 0 {
 		e.Fields().SetValueForPath(data, p.opt.Target)
 	} else {
 		for k, v := range data {
@@ -211,11 +217,17 @@ func (p *processor) Receive(e veino.IPacket) error {
 	return nil
 }
 
-func (p *processor) load() (err error) {
-	for name, path := range p.opt.Database {
-		p.databases[name], err = geoip2.Open(path)
+func (p *processor) load(databases interface{}) (err error) {
+	if databases == nil {
+		return errors.New("no valid GeoIP database found")
 	}
-	return err
+	for name, path := range databases.(map[string]interface{}) {
+		p.databases[name], err = geoip2.Open(path.(string))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (p *processor) getInfo() func(ip string) (lrucache.Cacheable, error) {
@@ -229,6 +241,7 @@ func (p *processor) getInfo() func(ip string) (lrucache.Cacheable, error) {
 		for name, db := range p.databases {
 			switch strings.ToLower(name) {
 			case "city":
+				fmt.Println("-=-=-=-")
 				if record, err := db.City(netIP); err == nil {
 					records.city = record
 				}
