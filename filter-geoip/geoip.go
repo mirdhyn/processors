@@ -126,7 +126,6 @@ func (p *processor) Configure(ctx veino.ProcessorContext, conf map[string]interf
 
 func (p *processor) Receive(e veino.IPacket) error {
 	ip, err := e.Fields().ValueForPathString(p.opt.Source)
-	p.Logger.Println("IP = ", ip)
 
 	if err != nil {
 		return err
@@ -144,7 +143,6 @@ func (p *processor) Receive(e veino.IPacket) error {
 	data := make(map[string]interface{})
 	lang := p.opt.Language
 
-	p.Logger.Println("p.opt.Fields = ", p.opt.Fields)
 	for _, field := range p.opt.Fields {
 		switch field {
 		// City database
@@ -273,7 +271,6 @@ func (p *processor) getInfo() func(ip string) (lrucache.Cacheable, error) {
 			//case "anonymousip":
 
 			default:
-				p.Logger.Println("-=-=-=-")
 				if record, err := db.City(netIP); err == nil {
 					records.city = record
 				}
