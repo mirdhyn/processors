@@ -2,7 +2,6 @@ package geoip
 
 import (
 	"errors"
-	"fmt"
 	"net"
 	"strings"
 
@@ -88,22 +87,31 @@ func (p *processor) Configure(ctx veino.ProcessorContext, conf map[string]interf
 			"organization",
 			"isp",
 		},
-		Language: "en",
+		Language:  "en",
+		CacheSize: 1000,
 	}
 	p.opt = &defaults
 
-	p.cache = lrucache.New(p.opt.CacheSize)
-	p.databases = map[string]*geoip2.Reader{}
+	err := p.ConfigureAndValidate(ctx, conf, p.opt)
 
-	if err := p.load(conf["databases"]); err != nil {
-		processors.DefaultLogger.Fatalln(err)
+	if err == nil {
+
+		p.cache = lrucache.New(p.opt.CacheSize)
+		p.databases = map[string]*geoip2.Reader{}
+
+		err = p.load(p.opt.Databases)
+		if err != nil {
+			p.Logger.Println(err)
+		}
 	}
-	return p.ConfigureAndValidate(ctx, conf, p.opt)
+
+	return err
 }
 
 func (p *processor) Receive(e veino.IPacket) error {
 	ip, err := e.Fields().ValueForPathString(p.opt.Source)
-	fmt.Println(ip)
+	p.Logger.Println("IP = ", ip)
+
 	if err != nil {
 		return err
 	}
@@ -116,12 +124,11 @@ func (p *processor) Receive(e veino.IPacket) error {
 	}
 
 	geoip := records.(geoipRecords)
-	fmt.Println(geoip)
 
 	data := make(map[string]interface{})
 	lang := p.opt.Language
 
-	fmt.Println(p.opt.Fields)
+	p.Logger.Println("p.opt.Fields = ", p.opt.Fields)
 	for _, field := range p.opt.Fields {
 		switch field {
 		// City database
@@ -217,12 +224,12 @@ func (p *processor) Receive(e veino.IPacket) error {
 	return nil
 }
 
-func (p *processor) load(databases interface{}) (err error) {
+func (p *processor) load(databases map[string]string) (err error) {
 	if databases == nil {
 		return errors.New("no valid GeoIP database found")
 	}
-	for name, path := range databases.(map[string]interface{}) {
-		p.databases[name], err = geoip2.Open(path.(string))
+	for name, path := range databases {
+		p.databases[name], err = geoip2.Open(path)
 		if err != nil {
 			return err
 		}
@@ -241,7 +248,7 @@ func (p *processor) getInfo() func(ip string) (lrucache.Cacheable, error) {
 		for name, db := range p.databases {
 			switch strings.ToLower(name) {
 			case "city":
-				fmt.Println("-=-=-=-")
+				p.Logger.Println("-=-=-=-")
 				if record, err := db.City(netIP); err == nil {
 					records.city = record
 				}
