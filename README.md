@@ -1,7 +1,10 @@
 # processors
 veino processors
 
-# contributors and used packages
+# contributors
+* @mirdhyn (GeoIP Filter, AMQP Input)
+
+# used packages
 * mitchellh/mapstructure
 * ChimeraCoder/anaconda
 * etrepat/postman/watch
@@ -16,4 +19,5 @@ veino processors
 * gopkg.in/go-playground/validator.v8
 * gopkg.in/mgo.v2
 * gopkg.in/olivere/elastic.v2
-* tsaikd/KDGoLib/futil
+* github.com/streadway/amqp
+* github.com/oschwald/geoip2-golang
