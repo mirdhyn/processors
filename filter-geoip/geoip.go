@@ -33,13 +33,20 @@ type options struct {
 	// Tags can be dynamic and include parts of the event using the %{field} syntax.
 	AddTag []string `mapstructure:"add_tag"`
 
-	// Path to the GeoIP database files, keyed by geoip_type.
-	// City database
+	// Path or url to the GeoIP database (can be gziped).
+	// Default value is "http://geolite.maxmind.com/download/geoip/database/GeoLite2-City.mmdb.gz".
 	Database string `mapstructure:"database"`
 
-	// Map of paths to the GeoIP database files, keyed by geoip_type.
-	// Country, City, ASN, ISP and organization databases are supported.
-	Databases map[string]string `mapstructure:"databases"`
+	// GeoIP database type. Default value is "city".
+	// Accepted value can be one of "city", "isp", "country" "domain" or "anonymousip"
+	Type string `mapstructure:"type"`
+
+	// GeoIP database update interval (in minutes). Default value is 0 (no updates).
+	// If `database` field contains an url, the database will be retrieved from this url at specified interval.
+	// ETag header is checked and new database will be downloaded only if necessary.
+	// If `database` field is a local path, the database will be re-loaded at specified interval.
+	// Note: the update process clear the cache and can impact performance.
+	UpdateInterval int `mapstructure:"update_interval"`
 
 	// An array of geoip fields to be included in the event.
 	// Possible fields depend on the database type. By default, all geoip fields are included in the event.
@@ -93,10 +100,12 @@ func (p *processor) Configure(ctx veino.ProcessorContext, conf map[string]interf
 			"organization",
 			"isp",
 		},
-		Language:  "en",
-		CacheSize: 1000,
-		Target:    "geoip",
-		Databases: map[string]string{},
+		Language:       "en",
+		CacheSize:      1000,
+		Target:         "geoip",
+		Type:           "city",
+		UpdateInterval: 0,
+		Database:       "http://geolite.maxmind.com/download/geoip/database/GeoLite2-City.mmdb.gz",
 	}
 	p.opt = &defaults
 
