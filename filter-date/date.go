@@ -14,36 +14,36 @@ func New() veino.Processor {
 type processor struct {
 	processors.Base
 
-	match_field_name string
-	match_patterns   []string
-	opt              *options
+	matchFieldName string
+	matchPatterns  []string
+	opt            *options
 }
 
 type options struct {
 	// If this filter is successful, add any arbitrary fields to this event.
-	Add_field map[string]interface{}
+	AddField map[string]interface{} `mapstructure:"add_field"`
 
 	// The date formats allowed are anything allowed by Golang time format.
 	// You can see the docs for this format https://golang.org/src/time/format.go#L20
 	// An array with field name first, and format patterns following, [ field, formats... ]
-	Match []string
+	Match []string `mapstructure:"match"`
 
 	// If this filter is successful, add arbitrary tags to the event. Tags can be dynamic
 	// and include parts of the event using the %{field} syntax.
-	Tags []string
+	AddTag []string `mapstructure:"add_tag"`
 
 	// If this filter is successful, remove arbitrary fields from this event.
-	Remove_field []string
+	RemoveField []string `mapstructure:"remove_field"`
 
-	Remove_Tag []string
+	RemoveTag []string `mapstructure:"remove_tag"`
 
 	// Append values to the tags field when there has been no successful match
-	// @default : ["_grokparsefailure"]
-	Tag_on_failure []string
+	// Default value is ["_dateparsefailure"]
+	TagOnFailure []string `mapstructure:"tag_on_failure"`
 
 	// Store the matching timestamp into the given target field. If not provided,
 	// default to updating the @timestamp field of the event
-	Target string
+	Target string `mapstructure:"target"`
 
 	// Specify a time zone canonical ID to be used for date parsing.
 	// The valid IDs are listed on IANA Time Zone database, such as "America/New_York".
@@ -52,19 +52,19 @@ type options struct {
 	//  will be used. Canonical ID is good as it takes care of daylight saving time
 	// for you For example, America/Los_Angeles or Europe/Paris are valid IDs.
 	// This field can be dynamic and include parts of the event using the %{field} syntax
-	Timezone string
+	Timezone string `mapstructure:"timezone"`
 }
 
 func (p *processor) Configure(ctx veino.ProcessorContext, conf map[string]interface{}) error {
 	p.opt.Target = "@timestamp"
-	p.opt.Tag_on_failure = []string{"_dateparsefailure"}
+	p.opt.TagOnFailure = []string{"_dateparsefailure"}
 
 	if err := p.ConfigureAndValidate(ctx, conf, p.opt); err != nil {
 		return err
 	}
 
-	p.match_field_name = p.opt.Match[0]
-	p.match_patterns = p.opt.Match[1:]
+	p.matchFieldName = p.opt.Match[0]
+	p.matchPatterns = p.opt.Match[1:]
 
 	return nil
 }
@@ -73,9 +73,9 @@ func (p *processor) Receive(e veino.IPacket) error {
 	dated := false
 	var value string
 	var err error
-	value, err = e.Fields().ValueForPathString(p.match_field_name)
+	value, err = e.Fields().ValueForPathString(p.matchFieldName)
 	if err == nil {
-		for _, layout := range p.match_patterns {
+		for _, layout := range p.matchPatterns {
 			var t time.Time
 
 			if p.opt.Timezone != "" {
@@ -93,13 +93,18 @@ func (p *processor) Receive(e veino.IPacket) error {
 
 			dated = true
 			e.Fields().SetValueForPath(t.Format(veino.VeinoTime), p.opt.Target)
-			processors.ProcessCommonFields(e.Fields(), p.opt.Add_field, p.opt.Tags, "")
+			processors.ProcessCommonFields2(e.Fields(),
+				p.opt.AddField,
+				p.opt.AddTag,
+				p.opt.RemoveField,
+				p.opt.RemoveTag,
+			)
 			break
 		}
 	}
 
 	if dated == false {
-		processors.AddTags(p.opt.Tag_on_failure, e.Fields())
+		processors.AddTags(p.opt.TagOnFailure, e.Fields())
 	}
 
 	p.Send(e, 0)
