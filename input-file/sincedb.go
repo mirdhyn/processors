@@ -24,23 +24,23 @@ func (p *processor) loadSinceDBInfos() (err error) {
 
 	p.sinceDBInfos = map[string]*sinceDBInfo{}
 
-	if p.opt.Sincedb_path == "" || p.opt.Sincedb_path == "/dev/null" {
+	if p.opt.SincedbPath == "" || p.opt.SincedbPath == "/dev/null" {
 		p.Logger.Println("No valid sincedb path")
 		return
 	}
 
-	if _, err := os.Stat(p.opt.Sincedb_path); os.IsNotExist(err) {
-		p.Logger.Printf("sincedb not found: %q", p.opt.Sincedb_path)
+	if _, err := os.Stat(p.opt.SincedbPath); os.IsNotExist(err) {
+		p.Logger.Printf("sincedb not found: %q", p.opt.SincedbPath)
 		return err
 	}
 
-	if raw, err = ioutil.ReadFile(p.opt.Sincedb_path); err != nil {
-		p.Logger.Printf("Read sincedb failed: %q\n%s", p.opt.Sincedb_path, err)
+	if raw, err = ioutil.ReadFile(p.opt.SincedbPath); err != nil {
+		p.Logger.Printf("Read sincedb failed: %q\n%s", p.opt.SincedbPath, err)
 		return
 	}
 
 	if err = json.Unmarshal(raw, &p.sinceDBInfos); err != nil {
-		p.Logger.Printf("Unmarshal sincedb failed: %q\n%s", p.opt.Sincedb_path, err)
+		p.Logger.Printf("Unmarshal sincedb failed: %q\n%s", p.opt.SincedbPath, err)
 		return
 	}
 
@@ -54,7 +54,7 @@ func (p *processor) saveSinceDBInfos() (err error) {
 
 	p.sinceDBLastSaveTime = time.Now()
 
-	if p.opt.Sincedb_path == "" || p.opt.Sincedb_path == "/dev/null" {
+	if p.opt.SincedbPath == "" || p.opt.SincedbPath == "/dev/null" {
 		p.Logger.Println("No valid sincedb path")
 		return
 	}
@@ -69,8 +69,8 @@ func (p *processor) saveSinceDBInfos() (err error) {
 
 	p.sinceDBLastInfosRaw = raw
 
-	if err = ioutil.WriteFile(p.opt.Sincedb_path, raw, 0664); err != nil {
-		p.Logger.Printf("Write sincedb failed: %q\n%s", p.opt.Sincedb_path, err)
+	if err = ioutil.WriteFile(p.opt.SincedbPath, raw, 0664); err != nil {
+		p.Logger.Printf("Write sincedb failed: %q\n%s", p.opt.SincedbPath, err)
 		return
 	}
 
@@ -81,7 +81,7 @@ func (p *processor) checkSaveSinceDBInfos() (err error) {
 	var (
 		raw []byte
 	)
-	if time.Since(p.sinceDBLastSaveTime) > time.Duration(p.opt.Sincedb_write_interval)*time.Second {
+	if time.Since(p.sinceDBLastSaveTime) > time.Duration(p.opt.SincedbWriteInterval)*time.Second {
 		if raw, err = json.Marshal(p.sinceDBInfos); err != nil {
 			p.Logger.Printf("Marshal sincedb failed: %s", err)
 			return
@@ -95,7 +95,7 @@ func (p *processor) checkSaveSinceDBInfos() (err error) {
 
 func (p *processor) checkSaveSinceDBInfosLoop() (err error) {
 	for {
-		time.Sleep(time.Duration(p.opt.Sincedb_write_interval) * time.Second)
+		time.Sleep(time.Duration(p.opt.SincedbWriteInterval) * time.Second)
 		if err = p.checkSaveSinceDBInfos(); err != nil {
 			return
 		}
