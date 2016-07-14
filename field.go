@@ -86,19 +86,27 @@ func AddFields(fields map[string]interface{}, data *mxj.Map) {
 }
 
 func AddTags(tags []string, data *mxj.Map) {
-	currenttags, err := data.ValueForPath("tags")
-	if err != nil {
-		currenttags = []string{}
+	var currentTags []string
+
+	currentTagsInterface, _ := data.ValueForPath("tags")
+
+	switch v := currentTagsInterface.(type) {
+	case string:
+		currentTags = []string{v}
+	case []string:
+		currentTags = currentTagsInterface.([]string)
+	default:
+		currentTags = []string{}
 	}
 
-	tags_eval := []string{}
+	tagsEval := []string{}
 	for _, t := range tags {
 		Dynamic(&t, data)
-		tags_eval = append(tags_eval, t)
+		tagsEval = append(tagsEval, t)
 	}
 
-	newtags := append(currenttags.([]string), tags_eval...)
-	data.SetValueForPath(newtags, "tags")
+	newTags := append(currentTags, tagsEval...)
+	data.SetValueForPath(newTags, "tags")
 }
 
 func RemoveTags(tags []string, data *mxj.Map) {
