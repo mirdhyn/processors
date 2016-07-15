@@ -144,14 +144,13 @@ func (p *processor) Receive(e veino.IPacket) error {
 	return nil
 }
 
-func (p *processor) Start(e veino.IPacket) (err error) {
-	p.conn, p.ch, err = p.setup()
+func (p *processor) Start(e veino.IPacket) error {
 	if p.opt.Persistent {
 		p.deliveryMode = amqp.Persistent
 	} else {
 		p.deliveryMode = amqp.Transient
 	}
-	return err
+	return p.setup()
 }
 
 func (p *processor) Stop(e veino.IPacket) error {
@@ -159,11 +158,15 @@ func (p *processor) Stop(e veino.IPacket) error {
 	return nil
 }
 
-func (p *processor) setup() (*amqp.Connection, *amqp.Channel, error) {
+func (p *processor) setup() (err error) {
 	scheme := map[bool]string{true: "amqps", false: "amqp"}[p.opt.SSL]
 	url := fmt.Sprintf("%s://%s:%s@%s:%d/%s", scheme, p.opt.User, p.opt.Password, p.opt.Host, p.opt.Port, p.opt.Vhost)
 
 	runtime.Logger().Infof("RabbitMQ output: connecting to %s\n", url)
+
+	if p.conn != nil {
+		p.conn.Close()
+	}
 
 	amqpConfig := amqp.Config{
 		Heartbeat: p.opt.Heartbeat * time.Second,
@@ -175,20 +178,20 @@ func (p *processor) setup() (*amqp.Connection, *amqp.Channel, error) {
 		amqpConfig.TLSClientConfig = &tls.Config{InsecureSkipVerify: !p.opt.VerifySSL}
 	}
 
-	conn, err := amqp.DialConfig(url, amqpConfig)
+	p.conn, err = amqp.DialConfig(url, amqpConfig)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	runtime.Logger().Infof("RabbitMQ output: connected to %s\n", p.opt.Host)
 
-	ch, err := conn.Channel()
+	p.ch, err = p.conn.Channel()
 	if err != nil {
-		return nil, nil, err
+		return err
 	}
 
 	if !p.opt.Passive {
-		if err := ch.ExchangeDeclare(
+		if err = p.ch.ExchangeDeclare(
 			p.opt.Exchange,
 			p.opt.ExchangeType,
 			p.opt.Durable,
@@ -197,9 +200,9 @@ func (p *processor) setup() (*amqp.Connection, *amqp.Channel, error) {
 			false, // noWait
 			p.opt.Arguments,
 		); err != nil {
-			return nil, nil, err
+			return err
 		}
 	}
 
-	return conn, ch, nil
+	return nil
 }
